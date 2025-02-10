@@ -14,33 +14,34 @@ jobs:
       -
         name: Check out the repo
         uses: actions/checkout@v3
-      -
-        name: Log in to Docker Hub
+      # Step 2: 登录到 GitHub Container Registry
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      -
-        name: Extract metadata (tags, labels) for Docker
+      # Step 3: 提取 Docker 镜像的元数据（标签和标签描述）
+      - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: JsonSong89/chatgpt-next-web
+          images: ghcr.io/${{ github.repository_owner }}/chatgpt-next-web
           tags: |
             type=raw,value=latest
             type=ref,event=tag
 
-      -
-        name: Set up QEMU
+      # Step 4: 设置 QEMU（支持多架构构建）
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
-      -
-        name: Set up Docker Buildx
+      # Step 5: 设置 Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      -
-        name: Build and push Docker image
+      # Step 6: 构建并推送 Docker 镜像到 GitHub Container Registry
+      - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
